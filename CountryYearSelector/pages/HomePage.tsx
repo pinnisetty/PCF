@@ -1,83 +1,26 @@
 import * as React from "react";
 import {
-  Dropdown,
-  IDropdownOption,
-  Text,
-} from "@fluentui/react";
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Button,
+  Divider,
+  Chip
+} from "@material-ui/core";
 
-import {
-  Globe24Regular,
-  Person24Regular,
-  People24Regular,
-} from "@fluentui/react-icons";
+import PublicIcon from "@material-ui/icons/Public";
+import PersonIcon from "@material-ui/icons/Person";
+import EngineeringIcon from "@material-ui/icons/Build";
 
 import { HomePageProps, RoleType } from "../types/types";
 import { COUNTRIES, YEARS, getRecordCount } from "../data/mockData";
 
-// ─────────────────────────────────────────────
-// PAGE WRAPPER
-// ─────────────────────────────────────────────
-
-const pageStyle: React.CSSProperties = {
-  minHeight: "100vh",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  background: "#f5f7fb",
-  padding: 24,
-  fontFamily: "'Segoe UI', sans-serif",
-};
-
-const cardStyle: React.CSSProperties = {
-  width: "100%",
-  maxWidth: 520,
-  background: "#ffffff",
-  borderRadius: 16,
-  padding: 28,
-  boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
-  display: "flex",
-  flexDirection: "column",
-  gap: 18,
-};
-
-// ─────────────────────────────────────────────
-// LABEL
-// ─────────────────────────────────────────────
-
-const labelStyle: React.CSSProperties = {
-  fontSize: 11,
-  fontWeight: 700,
-  letterSpacing: "0.08em",
-  textTransform: "uppercase",
-  color: "#6b7280",
-  marginBottom: 6,
-  width: "100%",
-  textAlign: "left",
-};
-
-// ─────────────────────────────────────────────
-// DROPDOWN STYLE (FIXED ARROW)
-// ─────────────────────────────────────────────
-
-const dropdownStyles = {
-  root: {
-    width: "100%",
-  },
-  title: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    width: "100%",
-    paddingLeft: 8,
-  },
-  dropdownItem: {
-    textAlign: "left",
-  },
-};
-
-// ─────────────────────────────────────────────
-// ROLE BUTTON
-// ─────────────────────────────────────────────
+/* ---------------- Role Button ---------------- */
 
 interface RoleBtnProps {
   role: RoleType;
@@ -86,177 +29,176 @@ interface RoleBtnProps {
   disabled: boolean;
 }
 
-const RoleButton: React.FC<RoleBtnProps> = ({
-  role,
-  count,
-  onClick,
-  disabled,
-}) => {
+const RoleButton: React.FC<RoleBtnProps> = ({ role, count, onClick, disabled }) => {
   const isManager = role === "manager";
+  const LabelIcon = isManager ? PersonIcon : EngineeringIcon;
   const label = isManager ? "Manager" : "Worker";
-  const iconColor = disabled ? "#9ca3af" : "#16a34a";
 
   return (
-    <button
+    <Button
       onClick={onClick}
       disabled={disabled}
+      fullWidth
+      variant="outlined"
       style={{
-        padding: 18,
-        borderRadius: 14,
-        border: `1px solid ${disabled ? "#e5e7eb" : "#86efac"}`,
-        background: disabled ? "#f9fafb" : "#f0fdf4",
-        cursor: disabled ? "not-allowed" : "pointer",
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
-        gap: 10,
-        opacity: disabled ? 0.6 : 1,
+        padding: 14,
+        borderRadius: 12,
+        borderColor: disabled ? "#e5e7eb" : "#86efac",
+        background: disabled ? "#f9fafb" : "#f0fdf4",
+        color: disabled ? "#9ca3af" : "#15803d",
+        textTransform: "none"
       }}
     >
-      <div
+      <Box
         style={{
-          width: 46,
-          height: 46,
+          width: 40,
+          height: 40,
           borderRadius: "50%",
-          background: disabled ? "#f3f4f6" : "#dcfce7",
+          background: disabled ? "#f3f4f6" : "#bbf7d0",
+          border: "1px solid #86efac",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          border: "1px solid #86efac",
+          marginBottom: 6
         }}
       >
-        {isManager ? (
-          <Person24Regular style={{ fontSize: 20, color: iconColor }} />
-        ) : (
-          <People24Regular style={{ fontSize: 20, color: iconColor }} />
-        )}
-      </div>
+        <LabelIcon style={{ fontSize: 20 }} />
+      </Box>
 
-      <div style={{ fontWeight: 700, color: "#15803d" }}>{label}</div>
+      <Typography style={{ fontWeight: 700 }}>{label}</Typography>
 
-      <div
+      <Chip
+        label={`${count} record${count !== 1 ? "s" : ""}`}
+        size="small"
         style={{
-          fontSize: 11,
-          padding: "2px 10px",
-          borderRadius: 20,
-          border: "1px solid #86efac",
+          marginTop: 6,
           background: "#dcfce7",
-          color: "#15803d",
-          fontWeight: 600,
+          border: "1px solid #86efac",
+          fontWeight: 700
         }}
-      >
-        {count} record{count !== 1 ? "s" : ""}
-      </div>
-    </button>
+      />
+    </Button>
   );
 };
 
-// ─────────────────────────────────────────────
-// HOME PAGE
-// ─────────────────────────────────────────────
+/* ---------------- Home Page ---------------- */
 
 export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
-  const [selectedCountry, setSelectedCountry] = React.useState("US");
-  const [selectedYear, setSelectedYear] = React.useState(2024);
-
-  const countryOptions: IDropdownOption[] = COUNTRIES.map((c) => ({
-    key: c.key,
-    text: `${c.flag} ${c.text}`,
-  }));
-
-  const yearOptions: IDropdownOption[] = YEARS.map((y) => ({
-    key: y.key,
-    text: y.text,
-  }));
+  const [selectedCountry, setSelectedCountry] = React.useState<string>("US");
+  const [selectedYear, setSelectedYear] = React.useState<number>(2024);
 
   const managerCount = getRecordCount(selectedCountry, selectedYear, "manager");
   const workerCount = getRecordCount(selectedCountry, selectedYear, "worker");
-
   const noData = managerCount === 0 && workerCount === 0;
 
   const selectedCountryLabel =
-    COUNTRIES.find((c) => c.key === selectedCountry)?.text ?? "";
+    COUNTRIES.find(c => c.key === selectedCountry)?.text ?? selectedCountry;
+
+  const handleCountryChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setSelectedCountry(event.target.value as string);
+  };
+
+  const handleYearChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setSelectedYear(Number(event.target.value));
+  };
 
   return (
-    <div style={pageStyle}>
-      <div style={cardStyle}>
+    <Box
+      style={{
+        height: "100%",
+        width: "100%",
+        background: "#f8fafc",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 16,
+        boxSizing: "border-box",
+        fontFamily: "Segoe UI, sans-serif"
+      }}
+    >
+      <Card
+        elevation={3}
+        style={{
+          width: "100%",
+          maxWidth: 420,
+          borderRadius: 16
+        }}
+      >
+        <CardContent style={{ padding: 24 }}>
+          {/* Header */}
+          <Box textAlign="center" mb={2}>
+            <PublicIcon style={{ fontSize: 36, color: "#16a34a" }} />
+            <Typography variant="h6" style={{ fontWeight: 700 }}>
+              Workforce Map
+            </Typography>
+            <Typography style={{ fontSize: 13, color: "#6b7280" }}>
+              Explore managers and workers by region
+            </Typography>
+          </Box>
 
-        {/* HEADER */}
-        <div style={{ textAlign: "center" }}>
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: 14,
-              background: "linear-gradient(135deg, #16a34a, #15803d)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "0 auto 12px",
-            }}
-          >
-            <Globe24Regular style={{ fontSize: 26, color: "white" }} />
-          </div>
+          {/* Country dropdown */}
+          <FormControl fullWidth size="small" style={{ marginTop: 12 }}>
+            <InputLabel>Country</InputLabel>
+            <Select value={selectedCountry} onChange={handleCountryChange}>
+              {COUNTRIES.map(c => (
+                <MenuItem key={c.key} value={c.key}>
+                  {c.flag} {c.text}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-          <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>
-            Workforce Map
-          </h2>
+          {/* Year dropdown */}
+          <FormControl fullWidth size="small" style={{ marginTop: 12 }}>
+            <InputLabel>Year</InputLabel>
+            <Select value={selectedYear} onChange={handleYearChange}>
+              {YEARS.map(y => (
+                <MenuItem key={y.key} value={y.key}>
+                  {y.text}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-          <p style={{ margin: "6px 0 0", color: "#6b7280", fontSize: 13 }}>
-            Explore managers and workers by region
-          </p>
-        </div>
+          <Divider style={{ margin: "20px 0" }} />
 
-        {/* COUNTRY */}
-        <div>
-          <div style={labelStyle}>Country</div>
-          <Dropdown
-            selectedKey={selectedCountry}
-            options={countryOptions}
-            onChange={(_, opt) => setSelectedCountry(String(opt?.key))}
-            styles={dropdownStyles}
-          />
-        </div>
+          {/* Role buttons — MUI v4 SAFE (no gap) */}
+          <Box display="flex" mt={1}>
+            <Box style={{ flex: 1, marginRight: 6 }}>
+              <RoleButton
+                role="manager"
+                count={managerCount}
+                onClick={() => onNavigate("manager", selectedCountry, selectedYear)}
+                disabled={managerCount === 0}
+              />
+            </Box>
 
-        {/* YEAR */}
-        <div>
-          <div style={labelStyle}>Year</div>
-          <Dropdown
-            selectedKey={selectedYear}
-            options={yearOptions}
-            onChange={(_, opt) => setSelectedYear(Number(opt?.key))}
-            styles={dropdownStyles}
-          />
-        </div>
+            <Box style={{ flex: 1, marginLeft: 6 }}>
+              <RoleButton
+                role="worker"
+                count={workerCount}
+                onClick={() => onNavigate("worker", selectedCountry, selectedYear)}
+                disabled={workerCount === 0}
+              />
+            </Box>
+          </Box>
 
-        {/* ROLE SECTION */}
-        <div>
-          <div style={labelStyle}>View by role</div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            <RoleButton
-              role="manager"
-              count={managerCount}
-              onClick={() => onNavigate("manager", selectedCountry, selectedYear)}
-              disabled={managerCount === 0}
-            />
-
-            <RoleButton
-              role="worker"
-              count={workerCount}
-              onClick={() => onNavigate("worker", selectedCountry, selectedYear)}
-              disabled={workerCount === 0}
-            />
-          </div>
-        </div>
-
-        {/* NO DATA */}
-        {noData && (
-          <Text styles={{ root: { color: "#ef4444", fontSize: 12 } }}>
-            No data available for {selectedCountryLabel} in {selectedYear}
-          </Text>
-        )}
-      </div>
-    </div>
+          {noData && (
+            <Typography
+              style={{
+                color: "#ef4444",
+                marginTop: 12,
+                textAlign: "center",
+                fontSize: 13
+              }}
+            >
+              No data available for {selectedCountryLabel} in {selectedYear}
+            </Typography>
+          )}
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
